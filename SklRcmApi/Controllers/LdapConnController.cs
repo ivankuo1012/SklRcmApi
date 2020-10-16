@@ -64,19 +64,41 @@ namespace SklRcmApi.Controllers
 		}
 		private Dictionary<string,string> GetLdapUserData(string userId, string password)
         {
-			SearchResultCollection sResults = null;
+			//SearchResultCollection sResults = null;
+			
+			SearchResult objSearchResult;
+			ResultPropertyCollection objPropertyCollection;
 			string path = "localhost:10389";
 			
-				//init a directory entry
-				DirectoryEntry dEntry = new DirectoryEntry(path, userId, password);
-				DirectorySearcher dSearcher = new DirectorySearcher(dEntry);
-				Dictionary<string, string> properties = new Dictionary<string, string>();
-				
-				dSearcher.Filter = "(&(objectClass=user)(cn="+ userId + "))";
+			//init a directory entry
+			DirectoryEntry dEntry = new DirectoryEntry(path, userId, password);
+			DirectorySearcher dSearcher = new DirectorySearcher(dEntry);
 
+			Dictionary<string, string> properties = new Dictionary<string, string>();
 				
-				sResults = dSearcher.FindAll();
-				foreach (SearchResult searchResult in sResults)
+			dSearcher.Filter = "(cn="+ userId + ")";
+            try
+            {
+				dSearcher.FindOne();
+			}
+			catch (Exception e)
+            {
+				System.Diagnostics.Debug.WriteLine(e);
+            }
+			objSearchResult = dSearcher.FindOne();
+			if (objSearchResult != null)
+				{
+					objPropertyCollection = objSearchResult.Properties;
+					foreach (string strPropertyName in objPropertyCollection.PropertyNames)
+					{
+						foreach (Object objMyCollection in objPropertyCollection[strPropertyName])
+						{
+						Console.WriteLine("Property Value: " + (string)objMyCollection.ToString());
+					}
+					}
+				}
+			/*
+			foreach (SearchResult searchResult in sResults)
 				{
 					
 						ResultPropertyValueCollection valueCollection =
@@ -94,7 +116,7 @@ namespace SklRcmApi.Controllers
 						//}
 						
 					
-				}
+				}*/
 			return properties;
 			
 
