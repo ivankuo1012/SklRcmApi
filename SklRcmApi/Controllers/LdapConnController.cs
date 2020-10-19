@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
+//using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.Protocols;
 using System.Linq;
 using System.Net;
@@ -20,22 +21,22 @@ namespace SklRcmApi.Controllers
             return new string[] { "value1", "value2" };
         }
 		[HttpPost]
-		public bool Login(UserData userdata)
+		public Dictionary<string,string> Login(UserData userdata)
 		{
 			string username = userdata.username;
 			string password = userdata.password;
-            if (ValidateLDAPUser(username, password))
+			Dictionary<string, string> userData = new Dictionary<string, string>();
+
+			if (ValidateLDAPUser(username, password))
             {
-				GetLdapUserData(username, password);
-				return true;
+				userData = GetLdapUserData(username, password);
+				//return userData;
             }
-            else
-            {
-				return false;
-            }
+			return userData;
+            
 			
 		}
-		static bool ValidateLDAPUser(string userId, string password)
+		static bool ValidateLDAPUser(string username, string password)
 		{
 			string ldapserver = "localhost";
 			string port = "10389";
@@ -47,7 +48,7 @@ namespace SklRcmApi.Controllers
 					ldapConnection.AuthType = AuthType.Basic;
 					ldapConnection.AutoBind = false;
 					ldapConnection.Timeout = new TimeSpan(0, 0, 0, 15);
-					var ldapUserId = userId+"@systex.tw";
+					var ldapUserId = username + "@systex.tw";
 					var credential = new NetworkCredential(ldapUserId, password);
 					ldapConnection.Bind(credential);
 					
@@ -62,41 +63,50 @@ namespace SklRcmApi.Controllers
 				return false;
 			}
 		}
-		private Dictionary<string,string> GetLdapUserData(string userId, string password)
+		
+		private Dictionary<string,string> GetLdapUserData(string username, string password)
         {
 			//SearchResultCollection sResults = null;
 			
-			SearchResult objSearchResult;
-			ResultPropertyCollection objPropertyCollection;
-			string path = "localhost:10389";
+			
+			//string ldapServer = "localhost:10389";
+			string path = "LDAP://localhost:10389/DC=systex,DC=tw";
 			
 			//init a directory entry
-			DirectoryEntry dEntry = new DirectoryEntry(path, userId, password);
+			DirectoryEntry dEntry = new DirectoryEntry(path, username, password);
+			dEntry.Path= path;
 			DirectorySearcher dSearcher = new DirectorySearcher(dEntry);
 
 			Dictionary<string, string> properties = new Dictionary<string, string>();
 				
-			dSearcher.Filter = "(cn="+ userId + ")";
-            try
-            {
-				dSearcher.FindOne();
-			}
-			catch (Exception e)
-            {
-				System.Diagnostics.Debug.WriteLine(e);
-            }
-			objSearchResult = dSearcher.FindOne();
-			if (objSearchResult != null)
+			dSearcher.Filter = "(cn="+ username + ")";
+			SearchResult result = dSearcher.FindOne();
+			if (result != null)
+			{
+				// user exists, cycle through LDAP fields (cn, telephonenumber etc.)  
+
+				ResultPropertyCollection fields = result.Properties;
+
+				foreach (String ldapField in fields.PropertyNames)
 				{
-					objPropertyCollection = objSearchResult.Properties;
-					foreach (string strPropertyName in objPropertyCollection.PropertyNames)
-					{
-						foreach (Object objMyCollection in objPropertyCollection[strPropertyName])
-						{
-						Console.WriteLine("Property Value: " + (string)objMyCollection.ToString());
-					}
-					}
+					// cycle through objects in each field e.g. group membership  
+					// (for many fields there will only be one object such as name)  
+
+					foreach (Object myCollection in fields[ldapField])
+                        if (!properties.ContainsKey(ldapField))
+                        {
+							properties.Add(ldapField, myCollection.ToString());
+						}
+						
+						//Console.WriteLine(String.Format("{0,-20} : {1}",ldapField, myCollection.ToString()));
 				}
+			}
+
+			else
+			{
+				// user does not exist  
+				Console.WriteLine("User not found!");
+			}
 			/*
 			foreach (SearchResult searchResult in sResults)
 				{
