@@ -7,39 +7,33 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Mvc;
 
 namespace SklRcmApi.Controllers
 {
     public class LdapConnController : ApiController
     {
-        public IEnumerable<string> Get()
-        {
-			string ladpserver = "10.1.255.200";
-			string port = "10389";
-			string userId = "1600218S";
-			
-            return new string[] { "value1", "value2" };
-        }
-		[HttpPost]
-		public Dictionary<string,string> Login(UserData userdata)
+		public Dictionary<string,string> Login(UserAuthData userdata)
 		{
-			string username = userdata.username;
-			string password = userdata.password;
+			string username = userdata.Username;
+			string password = userdata.Password;
 			Dictionary<string, string> userData = new Dictionary<string, string>();
 
 			if (ValidateLDAPUser(username, password))
             {
-				userData = GetLdapUserData(username, password);
+				userData = GetLdapUserData(username);
 				//return userData;
             }
 			return userData;
             
 			
 		}
+		
 		static bool ValidateLDAPUser(string username, string password)
 		{
-			string ldapserver = "localhost";
-			string port = "10389";
+			
+			string ldapserver = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServer"); //= "localhost";
+			string port = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerPort"); // = "10389";
 			try
 			{
 				using (var ldapConnection = new LdapConnection(
@@ -63,24 +57,25 @@ namespace SklRcmApi.Controllers
 				return false;
 			}
 		}
-		
-		private Dictionary<string,string> GetLdapUserData(string username, string password)
+		[System.Web.Mvc.HttpPost]
+		public Dictionary<string,string> GetLdapUserData(string searchUser)
         {
-			//SearchResultCollection sResults = null;
-			
-			
-			//string ldapServer = "localhost:10389";
-			string path = "LDAP://localhost:10389/DC=systex,DC=tw";
-			
-			//init a directory entry
+			string ldapserver = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServer"); //= "localhost";
+			string port = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerPort"); // = "10389";
+			string path = "LDAP://"+ ldapserver + ":"+ port + "/DC=systex,DC=tw";
+			string username = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerUserName");//= "1600218s";
+			string password = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerUserPassword"); //= "P@ssw0rdIvankuo";
+			string role = System.Configuration.ConfigurationManager.AppSettings.Get("role"); //= "P@ssw0rdIvankuo";
+																												   //init a directory entry
 			DirectoryEntry dEntry = new DirectoryEntry(path, username, password);
-			dEntry.Path= path;
+			//dEntry.Path= path;
 			DirectorySearcher dSearcher = new DirectorySearcher(dEntry);
 
-			Dictionary<string, string> properties = new Dictionary<string, string>();
+			Dictionary<string, string> ldapUserData = new Dictionary<string, string>();
 				
-			dSearcher.Filter = "(cn="+ username + ")";
+			dSearcher.Filter = "(|(cn=*"+ searchUser + "*)(displayname=*" + searchUser + "*)(sn=*" + searchUser + "*))";
 			SearchResult result = dSearcher.FindOne();
+			string[] listLdapField = { "displayname", "title", "department", "name", "mail" };
 			if (result != null)
 			{
 				// user exists, cycle through LDAP fields (cn, telephonenumber etc.)  
@@ -93,13 +88,16 @@ namespace SklRcmApi.Controllers
 					// (for many fields there will only be one object such as name)  
 
 					foreach (Object myCollection in fields[ldapField])
-                        if (!properties.ContainsKey(ldapField))
-                        {
-							properties.Add(ldapField, myCollection.ToString());
+						if (listLdapField.Contains(ldapField)){
+							ldapUserData.Add(ldapField, myCollection.ToString());
+							
 						}
-						
-						//Console.WriteLine(String.Format("{0,-20} : {1}",ldapField, myCollection.ToString()));
+					//
+					//;
+					//Console.WriteLine(String.Format("{0,-20} : {1}",ldapField, myCollection.ToString()));
 				}
+				ldapUserData.Add("login", true.ToString());
+				ldapUserData.Add("access_token", role);
 			}
 
 			else
@@ -107,36 +105,46 @@ namespace SklRcmApi.Controllers
 				// user does not exist  
 				Console.WriteLine("User not found!");
 			}
-			/*
-			foreach (SearchResult searchResult in sResults)
-				{
-					
-						ResultPropertyValueCollection valueCollection =
-						searchResult.Properties["position"];
-					properties.Add("position", valueCollection.ToString());
-
-						foreach (Object propertyValue in valueCollection)
-						{
-
-							
-							Console.WriteLine("Property Value: " + (string)propertyValue.ToString());
-
-							//["sAMAccountName"][0].ToString();
-						}
-						//}
-						
-					
-				}*/
-			return properties;
+			
+			return ldapUserData;
 			
 
 
 		}
-		public class UserData
+		[System.Web.Http.HttpPost]
+		public string TestApi()
+        {
+			string test = "test";
+			return  test ;
+        }
+		[System.Web.Http.HttpPost]
+		public IHttpActionResult GetUserData(UserSearchData searchUser)
 		{
-			public string username { get; set; }
-			public string password { get; set; }
+			//string searchUser = "1600218s";
+			Dictionary<string,string> userData = GetLdapUserData(searchUser.searchName);
+			//return userData;
+
+			return Ok(userData);
+
+
 		}
+		public class UserAuthData
+		{
+			public string Username { get; set; }
+			public string Password { get; set; }
+		}
+		public class UserData
+        {
+			public string Name { get; set; }
+			public string Displayname { get; set; }
+			public string Department { get; set; }
+			public string Title { get; set; }
+			public string Mail { get; set; }
+        }
+		public class UserSearchData
+        {
+			public string searchName { get; set; }
+        }
 	}
 
 }
