@@ -114,7 +114,7 @@ namespace SklRcmApi.Controllers
 
 		}
 		
-		public Dictionary<int, Dictionary<string, string>> SearchLdapUserData(string searchUser)
+		public List<Dictionary<string, string>> SearchLdapUserData(string searchUser)
 		{
 			string ldapserver = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServer"); //= "localhost";
 			string port = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerPort"); // = "10389";
@@ -126,8 +126,8 @@ namespace SklRcmApi.Controllers
 			DirectoryEntry dEntry = new DirectoryEntry(path, username, password);
 			//dEntry.Path= path;
 			DirectorySearcher dSearcher = new DirectorySearcher(dEntry);
-
-			Dictionary<int, Dictionary<string, string>> ldapUserData = new Dictionary<int, Dictionary<string, string>>();
+			List<Dictionary<string, string>> ldapUserDataCollection = new List<Dictionary<string, string>>();
+			//Dictionary<int, Dictionary<string, string>> ldapUserData = new Dictionary<int, Dictionary<string, string>>();
 
 			dSearcher.Filter = "(|(cn=*" + searchUser + "*)(displayname=*" + searchUser + "*)(sn=*" + searchUser + "*))";
 			SearchResultCollection results = dSearcher.FindAll();
@@ -138,7 +138,7 @@ namespace SklRcmApi.Controllers
 				foreach (SearchResult result in results)
 				{
 					ResultPropertyCollection fields = result.Properties;
-					ldapUserData.Add(i, new Dictionary<string, string>());
+					Dictionary<string, string> ldapUserData = new Dictionary<string, string>();
 					foreach (String ldapField in fields.PropertyNames)
 					{
 						// cycle through objects in each field e.g. group membership  
@@ -149,13 +149,15 @@ namespace SklRcmApi.Controllers
 							{
 								
 
-								ldapUserData[i].Add(ldapField, myCollection.ToString());
+								ldapUserData.Add(ldapField, myCollection.ToString());
 							}
 						
 						//
 						//;
 						//Console.WriteLine(String.Format("{0,-20} : {1}",ldapField, myCollection.ToString()));
 					}
+					ldapUserDataCollection.Add(ldapUserData);
+
 					i++;
 				}
 
@@ -168,7 +170,7 @@ namespace SklRcmApi.Controllers
 				Console.WriteLine("User not found!");
 			}
 
-			return ldapUserData;
+			return ldapUserDataCollection;
 
 
 
@@ -194,7 +196,7 @@ namespace SklRcmApi.Controllers
 		public IHttpActionResult SearchUserData(UserSearchData searchUser)
 		{
 			//string searchUser = "1600218s";
-			Dictionary<int, Dictionary<string,string>> userData = SearchLdapUserData(searchUser.searchName);
+			List<Dictionary<string,string>> userData = SearchLdapUserData(searchUser.searchName);
 			//return userData;
 
 			return Ok(userData);
