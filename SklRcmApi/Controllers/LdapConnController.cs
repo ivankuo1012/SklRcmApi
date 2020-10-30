@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices;
 //using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.Protocols;
@@ -97,7 +98,8 @@ namespace SklRcmApi.Controllers
 					//Console.WriteLine(String.Format("{0,-20} : {1}",ldapField, myCollection.ToString()));
 				}
 				ldapUserData.Add("login", true.ToString());
-				ldapUserData.Add("access_token", role);
+				ldapUserData.Add("access_token", "access_token");
+				ldapUserData.Add("role", role);
 			}
 
 			else
@@ -108,6 +110,66 @@ namespace SklRcmApi.Controllers
 			
 			return ldapUserData;
 			
+
+
+		}
+		
+		public Dictionary<int, Dictionary<string, string>> SearchLdapUserData(string searchUser)
+		{
+			string ldapserver = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServer"); //= "localhost";
+			string port = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerPort"); // = "10389";
+			string path = "LDAP://" + ldapserver + ":" + port + "/DC=systex,DC=tw";
+			string username = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerUserName");//= "1600218s";
+			string password = System.Configuration.ConfigurationManager.AppSettings.Get("LdapServerUserPassword"); //= "P@ssw0rdIvankuo";
+			string role = System.Configuration.ConfigurationManager.AppSettings.Get("role"); //= "P@ssw0rdIvankuo";
+			int i = 0;                                                                                                     //init a directory entry
+			DirectoryEntry dEntry = new DirectoryEntry(path, username, password);
+			//dEntry.Path= path;
+			DirectorySearcher dSearcher = new DirectorySearcher(dEntry);
+
+			Dictionary<int, Dictionary<string, string>> ldapUserData = new Dictionary<int, Dictionary<string, string>>();
+
+			dSearcher.Filter = "(|(cn=*" + searchUser + "*)(displayname=*" + searchUser + "*)(sn=*" + searchUser + "*))";
+			SearchResultCollection results = dSearcher.FindAll();
+			string[] listLdapField = { "displayname", "title", "department", "name", "mail" };
+			if (results != null)
+			{
+				// user exists, cycle through LDAP fields (cn, telephonenumber etc.)  
+				foreach (SearchResult result in results)
+				{
+					ResultPropertyCollection fields = result.Properties;
+					ldapUserData.Add(i, new Dictionary<string, string>());
+					foreach (String ldapField in fields.PropertyNames)
+					{
+						// cycle through objects in each field e.g. group membership  
+						// (for many fields there will only be one object such as name)  
+
+						foreach (Object myCollection in fields[ldapField])
+							if (listLdapField.Contains(ldapField))
+							{
+								
+
+								ldapUserData[i].Add(ldapField, myCollection.ToString());
+							}
+						
+						//
+						//;
+						//Console.WriteLine(String.Format("{0,-20} : {1}",ldapField, myCollection.ToString()));
+					}
+					i++;
+				}
+
+
+			}
+
+			else
+			{
+				// user does not exist  
+				Console.WriteLine("User not found!");
+			}
+
+			return ldapUserData;
+
 
 
 		}
@@ -122,6 +184,17 @@ namespace SklRcmApi.Controllers
 		{
 			//string searchUser = "1600218s";
 			Dictionary<string,string> userData = GetLdapUserData(searchUser.searchName);
+			//return userData;
+
+			return Ok(userData);
+
+
+		}
+		[System.Web.Http.HttpPost]
+		public IHttpActionResult SearchUserData(UserSearchData searchUser)
+		{
+			//string searchUser = "1600218s";
+			Dictionary<int, Dictionary<string,string>> userData = SearchLdapUserData(searchUser.searchName);
 			//return userData;
 
 			return Ok(userData);
