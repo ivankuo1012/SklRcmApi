@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="RCMModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="apply">
+          <Key>
+            <PropertyRef Name="app_id" />
+          </Key>
+          <Property Name="app_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="app_user" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="app_comment" Type="text" Nullable="false" />
+          <Property Name="app_date" Type="datetime" Nullable="false" />
+          <Property Name="app_approve_user" Type="nchar" MaxLength="200" />
+          <Property Name="app_approve_date" Type="datetime" />
+          <Property Name="app_approve_check" Type="bit" />
+          <Property Name="app_approve" Type="int" />
+          <Property Name="app_upload" Type="text" />
+        </EntityType>
+        <EntityType Name="upload">
+          <Key>
+            <PropertyRef Name="up_id" />
+          </Key>
+          <Property Name="up_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="up_filename" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="up_path" Type="text" Nullable="false" />
+          <Property Name="up_user" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="up_date" Type="datetime" Nullable="false" />
+          <Property Name="up_apply" Type="int" />
+          <Property Name="up_message" Type="text" Nullable="false" />
+          <Property Name="up_size" Type="bigint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="user_role" Type="int" Nullable="false" />
+          <Property Name="user_status" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="RCMModelStoreContainer">
+          <EntitySet Name="apply" EntityType="Self.apply" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="upload" EntityType="Self.upload" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="users" EntityType="Self.users" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RCMModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="upload">
+          <Key>
+            <PropertyRef Name="up_id" />
+          </Key>
+          <Property Name="up_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="up_filename" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="up_user" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="up_date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="up_path" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="up_apply" Type="Int32" />
+          <Property Name="up_message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="up_size" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="upload" EntityType="Self.upload" />
+          <EntitySet Name="apply" EntityType="RCMModel.apply" />
+          <EntitySet Name="users" EntityType="RCMModel.users" />
+        </EntityContainer>
+        <EntityType Name="apply">
+          <Key>
+            <PropertyRef Name="app_id" />
+          </Key>
+          <Property Name="app_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="app_user" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="app_comment" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="app_date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="app_approve_user" Type="String" MaxLength="200" FixedLength="true" Unicode="true" />
+          <Property Name="app_approve_date" Type="DateTime" Precision="3" />
+          <Property Name="app_approve_check" Type="Boolean" />
+          <Property Name="app_approve" Type="Int16" />
+          <Property Name="app_upload" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="user_role" Type="Int32" Nullable="false" />
+          <Property Name="user_status" Type="Boolean" Nullable="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="RCMModelStoreContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="upload">
+            <EntityTypeMapping TypeName="RCMModel.upload">
+              <MappingFragment StoreEntitySet="upload">
+                <ScalarProperty Name="up_size" ColumnName="up_size" />
+                <ScalarProperty Name="up_message" ColumnName="up_message" />
+                <ScalarProperty Name="up_apply" ColumnName="up_apply" />
+                <ScalarProperty Name="up_path" ColumnName="up_path" />
+                <ScalarProperty Name="up_id" ColumnName="up_id" />
+                <ScalarProperty Name="up_filename" ColumnName="up_filename" />
+                <ScalarProperty Name="up_user" ColumnName="up_user" />
+                <ScalarProperty Name="up_date" ColumnName="up_date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="apply">
+            <EntityTypeMapping TypeName="RCMModel.apply">
+              <MappingFragment StoreEntitySet="apply">
+                <ScalarProperty Name="app_upload" ColumnName="app_upload" />
+                <ScalarProperty Name="app_approve" ColumnName="app_approve" />
+                <ScalarProperty Name="app_approve_check" ColumnName="app_approve_check" />
+                <ScalarProperty Name="app_approve_date" ColumnName="app_approve_date" />
+                <ScalarProperty Name="app_approve_user" ColumnName="app_approve_user" />
+                <ScalarProperty Name="app_date" ColumnName="app_date" />
+                <ScalarProperty Name="app_comment" ColumnName="app_comment" />
+                <ScalarProperty Name="app_user" ColumnName="app_user" />
+                <ScalarProperty Name="app_id" ColumnName="app_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="RCMModel.users">
+              <MappingFragment StoreEntitySet="users">
+                <ScalarProperty Name="user_status" ColumnName="user_status" />
+                <ScalarProperty Name="user_role" ColumnName="user_role" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

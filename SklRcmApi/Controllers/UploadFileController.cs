@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SklRcmApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,9 +13,11 @@ namespace SklRcmApi.Controllers
 {
     public class UploadFileController : ApiController
     {
+        
         public HttpResponseMessage Upload()
         {
-            HttpResponseMessage result;
+            var db = new Entities();
+        HttpResponseMessage result;
             var httpRequest = HttpContext.Current.Request;
 
             Debug.WriteLine("upload start");
@@ -28,25 +31,22 @@ namespace SklRcmApi.Controllers
                 var filePath = HttpContext.Current.Server.MapPath("~/FileUploads/" + postedFile.FileName);
                 postedFile.SaveAs(filePath);
 
-                //foreach (string file in httpRequest.Files)
-                //{
-                //    var postedFile = httpRequest.Files[file]
-                //    //Debug.Write(httpRequest.Files[file]);
-                //    var filePath = HttpContext.Current.Server.MapPath("~/FileUploads/" + postedFile.FileName);
-
-                //    postedFile.SaveAs(filePath);
-                //    docfiles.Add(filePath);
-                //}
-
-                //Dictionary<string, dynamic> importDB = readExcelToDb(filePath);
                 resultAry.Add("file_name", postedFile.FileName);
                 resultAry.Add("file_path", filePath);
                 FileInfo fi = new FileInfo(filePath);
                 resultAry.Add("file_size", fi.Length);
 
                 //resultAry.Add("import_result", importDB);
-
-
+                Debug.WriteLine(httpRequest["up_user"]);
+                upload upload = new upload();
+                upload.up_user = httpRequest["up_user"];
+                upload.up_message = httpRequest["up_message"];
+                upload.up_path = Path.GetDirectoryName(filePath);
+                upload.up_filename = postedFile.FileName;
+                upload.up_date = DateTime.Now;
+                upload.up_size = fi.Length;
+                db.upload.Add(upload);
+                db.SaveChanges();
                 result = Request.CreateResponse(HttpStatusCode.Created, resultAry);
 
 
