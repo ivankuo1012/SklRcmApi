@@ -47,6 +47,7 @@ namespace SklRcmApi.Controllers
                 upload.up_size = fi.Length;
                 db.upload.Add(upload);
                 db.SaveChanges();
+                resultAry.Add("up_row", upload);
                 result = Request.CreateResponse(HttpStatusCode.Created, resultAry);
 
 

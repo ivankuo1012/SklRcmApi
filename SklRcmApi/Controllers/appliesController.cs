@@ -29,6 +29,10 @@ namespace SklRcmApi.Controllers
         {
             return db.apply.Where(x => x.app_user.Equals(up_user)); 
         }
+        public IQueryable<apply> GetapplyApprove(string app_approve_user = "")
+        {
+            return db.apply.Where(x => x.app_approve_user.Equals(app_approve_user));
+        }
         /*
         [System.Web.Http.HttpGet]
         public IHttpActionResult Getapplies(string up_user = "")

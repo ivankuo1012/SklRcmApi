@@ -29,7 +29,7 @@
           <Property Name="up_user" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="up_date" Type="datetime" Nullable="false" />
           <Property Name="up_apply" Type="int" />
-          <Property Name="up_message" Type="text" Nullable="false" />
+          <Property Name="up_message" Type="text" />
           <Property Name="up_size" Type="bigint" Nullable="false" />
         </EntityType>
         <EntityType Name="users">
@@ -59,7 +59,7 @@
           <Property Name="up_date" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="up_path" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="up_apply" Type="Int32" />
-          <Property Name="up_message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="up_message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="true" />
           <Property Name="up_size" Type="Int64" Nullable="false" />
         </EntityType>
         <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
