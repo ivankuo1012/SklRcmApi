@@ -13,9 +13,9 @@
           <Property Name="app_user" Type="nvarchar" MaxLength="200" Nullable="false" />
           <Property Name="app_comment" Type="text" Nullable="false" />
           <Property Name="app_date" Type="datetime" Nullable="false" />
-          <Property Name="app_approve_user" Type="nchar" MaxLength="200" />
+          <Property Name="app_approve_user" Type="nvarchar" MaxLength="200" />
           <Property Name="app_approve_date" Type="datetime" />
-          <Property Name="app_approve_check" Type="bit" />
+          <Property Name="app_approve_check" Type="bit" Nullable="false" />
           <Property Name="app_approve" Type="int" />
           <Property Name="app_upload" Type="text" />
         </EntityType>
@@ -75,9 +75,9 @@
           <Property Name="app_user" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="app_comment" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="app_date" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="app_approve_user" Type="String" MaxLength="200" FixedLength="true" Unicode="true" />
+          <Property Name="app_approve_user" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
           <Property Name="app_approve_date" Type="DateTime" Precision="3" />
-          <Property Name="app_approve_check" Type="Boolean" />
+          <Property Name="app_approve_check" Type="Boolean" Nullable="false" />
           <Property Name="app_approve" Type="Int16" />
           <Property Name="app_upload" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>

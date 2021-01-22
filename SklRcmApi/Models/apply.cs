@@ -20,7 +20,7 @@ namespace SklRcmApi.Models
         public System.DateTime app_date { get; set; }
         public string app_approve_user { get; set; }
         public Nullable<System.DateTime> app_approve_date { get; set; }
-        public Nullable<bool> app_approve_check { get; set; }
+        public bool app_approve_check { get; set; }
         public Nullable<short> app_approve { get; set; }
         public string app_upload { get; set; }
     }

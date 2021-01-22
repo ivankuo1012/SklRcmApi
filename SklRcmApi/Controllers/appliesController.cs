@@ -29,9 +29,26 @@ namespace SklRcmApi.Controllers
         {
             return db.apply.Where(x => x.app_user.Equals(up_user)); 
         }
-        public IQueryable<apply> GetapplyApprove(string app_approve_user = "")
+        public List<apply> GetapplyApprove(bool? app_approve_check=false, string app_approve_user = "", int? app_approve = 2 )
         {
-            return db.apply.Where(x => x.app_approve_user.Equals(app_approve_user));
+            Debug.WriteLine(app_approve_check);
+            var result = new List<apply>();
+            IQueryable<apply> data=db.apply ; 
+
+            if (app_approve_user != "")
+            {
+                data =data.Where(x => x.app_approve_user.Equals(app_approve_user));
+            }
+            if (app_approve_check != false)
+            {
+               data= data.Where(x => x.app_approve_check==true);
+            }
+            if (app_approve != null)
+            {
+              data=  data.Where(x => x.app_approve == app_approve);
+            }
+            //result = data.ToList();
+            return data.ToList();
         }
         /*
         [System.Web.Http.HttpGet]
