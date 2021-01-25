@@ -22,5 +22,8 @@ namespace SklRcmApi.Models
         public Nullable<int> up_apply { get; set; }
         public string up_message { get; set; }
         public long up_size { get; set; }
+        public Nullable<bool> app_check { get; set; }
+        public Nullable<int> app_approve { get; set; }
+        public Nullable<System.DateTime> app_date { get; set; }
     }
 }

@@ -22,6 +22,18 @@ namespace SklRcmApi.Controllers
         public class ApplyUpload
         {
             public string app_upload { get; set; }
+            public int up_id { get; set; }
+            public string up_filename { get; set; }
+            public string up_path { get; set; }
+            public string up_user { get; set; }
+            public DateTime up_date { get; set; }
+            public int up_apply { get; set; }
+            public string up_message { get; set; }
+            public int up_size { get; set; }
+            public bool app_check { get; set; }
+            public int app_approve { get; set; }
+            public DateTime app_date { get; set; }
+            
         }
         
         // GET: api/applies
@@ -29,26 +41,31 @@ namespace SklRcmApi.Controllers
         {
             return db.apply.Where(x => x.app_user.Equals(up_user)); 
         }
-        public List<apply> GetapplyApprove(bool? app_approve_check=false, string app_approve_user = "", int? app_approve = 2 )
+        public List<apply> GetapplyApprove( string app_approve_user = "", int? app_approve = null )
         {
-            Debug.WriteLine(app_approve_check);
-            var result = new List<apply>();
-            IQueryable<apply> data=db.apply ; 
+            string strSqlApprove =(app_approve!=null)? "where app_approve is null":"";
+            string strSqlApproveUser =(app_approve_user!="")? $"where app_approve_user = '{app_approve_user}'":"";
+            string strSql = $"select * from apply a join (select distinct up_apply from upload {strSqlApprove} ) u on u.up_apply = a.app_id {strSqlApproveUser}";
+            Debug.WriteLine(strSql);
+            var result = db.apply.SqlQuery(strSql).ToList();
+            
+            //var result = new List<apply>();
+            //IQueryable<apply> data = from a in db.apply
+            //                         join u in db.upload on a.app_id equals u.up_apply
+            //                         where u.app_approve == app_approve
+            //                         select  a;
 
-            if (app_approve_user != "")
-            {
-                data =data.Where(x => x.app_approve_user.Equals(app_approve_user));
-            }
-            if (app_approve_check != false)
-            {
-               data= data.Where(x => x.app_approve_check==true);
-            }
-            if (app_approve != null)
-            {
-              data=  data.Where(x => x.app_approve == app_approve);
-            }
+            //if (app_approve_user != "")
+            //{
+            //    data =data.Where(x => x.app_approve_user.Equals(app_approve_user));
+            //}
+            
+            //if (app_approve != null)
+            //{
+            //  data=  data.where(x => x.app_approve == app_approve);
+            //}
             //result = data.ToList();
-            return data.ToList();
+            return result;
         }
         /*
         [System.Web.Http.HttpGet]

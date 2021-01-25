@@ -14,10 +14,6 @@
           <Property Name="app_comment" Type="text" Nullable="false" />
           <Property Name="app_date" Type="datetime" Nullable="false" />
           <Property Name="app_approve_user" Type="nvarchar" MaxLength="200" />
-          <Property Name="app_approve_date" Type="datetime" />
-          <Property Name="app_approve_check" Type="bit" Nullable="false" />
-          <Property Name="app_approve" Type="int" />
-          <Property Name="app_upload" Type="text" />
         </EntityType>
         <EntityType Name="upload">
           <Key>
@@ -31,6 +27,9 @@
           <Property Name="up_apply" Type="int" />
           <Property Name="up_message" Type="text" />
           <Property Name="up_size" Type="bigint" Nullable="false" />
+          <Property Name="app_check" Type="bit" />
+          <Property Name="app_approve" Type="int" />
+          <Property Name="app_date" Type="datetime" />
         </EntityType>
         <EntityType Name="users">
           <Key>
@@ -61,6 +60,9 @@
           <Property Name="up_apply" Type="Int32" />
           <Property Name="up_message" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="true" />
           <Property Name="up_size" Type="Int64" Nullable="false" />
+          <Property Name="app_check" Type="Boolean" />
+          <Property Name="app_approve" Type="Int32" />
+          <Property Name="app_date" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="upload" EntityType="Self.upload" />
@@ -76,10 +78,6 @@
           <Property Name="app_comment" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="app_date" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="app_approve_user" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
-          <Property Name="app_approve_date" Type="DateTime" Precision="3" />
-          <Property Name="app_approve_check" Type="Boolean" Nullable="false" />
-          <Property Name="app_approve" Type="Int16" />
-          <Property Name="app_upload" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="users">
           <Key>
@@ -98,6 +96,9 @@
           <EntitySetMapping Name="upload">
             <EntityTypeMapping TypeName="RCMModel.upload">
               <MappingFragment StoreEntitySet="upload">
+                <ScalarProperty Name="app_date" ColumnName="app_date" />
+                <ScalarProperty Name="app_approve" ColumnName="app_approve" />
+                <ScalarProperty Name="app_check" ColumnName="app_check" />
                 <ScalarProperty Name="up_size" ColumnName="up_size" />
                 <ScalarProperty Name="up_message" ColumnName="up_message" />
                 <ScalarProperty Name="up_apply" ColumnName="up_apply" />
@@ -112,10 +113,6 @@
           <EntitySetMapping Name="apply">
             <EntityTypeMapping TypeName="RCMModel.apply">
               <MappingFragment StoreEntitySet="apply">
-                <ScalarProperty Name="app_upload" ColumnName="app_upload" />
-                <ScalarProperty Name="app_approve" ColumnName="app_approve" />
-                <ScalarProperty Name="app_approve_check" ColumnName="app_approve_check" />
-                <ScalarProperty Name="app_approve_date" ColumnName="app_approve_date" />
                 <ScalarProperty Name="app_approve_user" ColumnName="app_approve_user" />
                 <ScalarProperty Name="app_date" ColumnName="app_date" />
                 <ScalarProperty Name="app_comment" ColumnName="app_comment" />
